@@ -10,10 +10,12 @@ public class GameOverManger : MonoBehaviour
     public InputController inp;
     public Animator anim;
 
+    ObjectPool Pool;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        Pool = ObjectPool.GetInstance();
     }
 
     // Update is called once per frame
@@ -22,6 +24,7 @@ public class GameOverManger : MonoBehaviour
         //胜利
         if(EnemyManager.isWin == true)
         {
+            Pool.ClearAll();
             inp.enabled = false;
             Player.GetComponent<PlayerMove>().enabled = false;
             ShotEffects.SetActive(false);
@@ -31,6 +34,7 @@ public class GameOverManger : MonoBehaviour
         //失败
         if(EnemyManager.isWin == false && Player.GetComponent<IHealth>().GetHealth() <= 0)
         {
+            Pool.ClearAll();
             inp.enabled = false;
             Player.GetComponent<PlayerMove>().enabled = false;
             ShotEffects.SetActive(false);

@@ -14,16 +14,25 @@ public class Supply : MonoBehaviour
     IShoot[] GunSupply;
     MeshRenderer mesh;
 
+    ObjectPool Pool;
+
     //补给箱中每种补给的概率
     int[] Chance = { 0, 0, 0, 0, 0, 0, 0 , 1, 1, 1, 2, 2, 3, 3 ,3,3,3 };
     int SupplyType = 0;
 
     int SupplyNum = 0;
     // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
+        Pool = ObjectPool.GetInstance();
         mesh = GetComponent<MeshRenderer>();
+        mesh.enabled = true;
         SupplyType = Chance[Random.Range(0, Chance.Length - 1)];
+    }
+
+    private void OnDisable()
+    {
+        SupplyText.color = new Color(1,1,1,0);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -61,9 +70,14 @@ public class Supply : MonoBehaviour
 
             anim.SetTrigger("Supply");
             mesh.enabled = false;
-            Destroy(gameObject, 0.55f);
+            StartCoroutine(Recovery());
         }
+    }
 
+    IEnumerator Recovery()
+    {
+        yield return new WaitForSeconds(0.6f);
+        Pool.RecycleObj(gameObject);
     }
 }
 

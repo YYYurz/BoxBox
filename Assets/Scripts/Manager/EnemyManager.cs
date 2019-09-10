@@ -14,10 +14,6 @@ public class EnemyManager : MonoBehaviour
     public int[] LevelSpider = new int[10];
     [Header("玩家生命脚本")]
     public PlayerHealth playerHealth;
-    [Header("僵尸预制件")]
-    public GameObject Zombie;
-    [Header("蜘蛛预制件")]
-    public GameObject Spider;
     [Header("过关动画")]
     public Animator LevelAnimator;
     [Header("过关文本UI")]
@@ -41,6 +37,9 @@ public class EnemyManager : MonoBehaviour
     //每一关怪物剩余数量
     public static int EnemyNum = 0;
 
+    //使用对象池
+    ObjectPool Pool;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -49,6 +48,7 @@ public class EnemyManager : MonoBehaviour
         Z = 0;
         S = 0;
 
+        Pool = ObjectPool.GetInstance();
         LevelAudio = GetComponent<AudioSource>();
         EnemyNum = LevelZombie[0] + LevelSpider[0];
         LevelAnimator.SetTrigger("Level");
@@ -108,14 +108,14 @@ public class EnemyManager : MonoBehaviour
     //生成僵尸
     void SpawnZombie()
     {
-        Instantiate(Zombie, SpawnPoint[(int)Random.Range(0, 3.99f)].position, transform.rotation);
+        Pool.GetObj("Zombie", SpawnPoint[(int)Random.Range(0, 3.99f)].position, transform.rotation);
         Z++;
     }
 
     //生成蜘蛛
     void SpawnSpider()
     {
-        Instantiate(Spider, SpawnPoint[(int)Random.Range(0, 3.99f)].position, transform.rotation);
+        Pool.GetObj("Spider", SpawnPoint[(int)Random.Range(0, 3.99f)].position, transform.rotation);
         S++;
     }
 }

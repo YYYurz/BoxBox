@@ -18,8 +18,6 @@ public class EnemyHealth : MonoBehaviour,IHealth
     public AudioClip deathClip;
     [Header("生命值UI")]
     public GameObject HealthCanvas;
-    [Header("补给")]
-    public GameObject Supply;
 
 
     float TimeBetweenGunShotDamage = 0.7f;
@@ -31,6 +29,8 @@ public class EnemyHealth : MonoBehaviour,IHealth
     bool isDead;
     bool isSinking;
 
+    //使用对象池
+    ObjectPool Pool;
 
     void Awake()
     {
@@ -38,9 +38,26 @@ public class EnemyHealth : MonoBehaviour,IHealth
         enemyAudio = GetComponent<AudioSource>();
         capsuleCollider = GetComponent<CapsuleCollider>();
         sphereCollider = GetComponent<SphereCollider>();
-        currentHealth = startingHealth;
     }
 
+    private void OnEnable()
+    {
+        Pool = ObjectPool.GetInstance();
+        currentHealth = startingHealth;
+        HealthCanvas.SetActive(true);
+    }
+
+    private void OnDisable()
+    {
+        isDead = false;
+
+        capsuleCollider.enabled = true;
+        sphereCollider.enabled = true;
+        
+        GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = true;
+        GetComponent<Rigidbody>().isKinematic = false;
+        isSinking = false;
+    }
 
     void Update()
     {
@@ -56,9 +73,7 @@ public class EnemyHealth : MonoBehaviour,IHealth
     {
         if (isDead)
             return;
-
-        //enemyAudio.Play();
-
+        
         currentHealth -= damage - Armor;
 
         if (currentHealth <= 0)
@@ -104,9 +119,7 @@ public class EnemyHealth : MonoBehaviour,IHealth
         sphereCollider.enabled = false;
 
         anim.SetTrigger("Dead");
-
-        enemyAudio.clip = deathClip;
-        enemyAudio.volume = 0.4f;
+        
         enemyAudio.Play();
         
     }
@@ -114,8 +127,8 @@ public class EnemyHealth : MonoBehaviour,IHealth
     //当死亡动画触发时由动画触发事件   死亡动画播放完后尸体下沉并销毁
     public void StartSinking()
     {
-        if (Random.Range(0,10) < 2.8)
-            Instantiate(Supply, transform.position, transform.rotation);
+        if (Random.Range(0, 10) < 2.8)
+            Pool.GetObj("Supply", transform.position, transform.rotation);
 
         HealthCanvas.SetActive(false);
         GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = false;
@@ -123,7 +136,7 @@ public class EnemyHealth : MonoBehaviour,IHealth
         isSinking = true;
         ScoreManager.score += scoreValue;
         EnemyManager.EnemyNum--;
-        Destroy(gameObject, 0.7f);
+        StartCoroutine(Recovery());
     }
 
     public void SetHealth(int Health) { }
@@ -131,5 +144,11 @@ public class EnemyHealth : MonoBehaviour,IHealth
     public int GetHealth()
     {
         return currentHealth;
+    }
+
+    IEnumerator Recovery()
+    {
+        yield return new WaitForSeconds(0.7f);
+        Pool.RecycleObj(gameObject);
     }
 }

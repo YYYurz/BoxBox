@@ -24,7 +24,12 @@ public class EnemyAttack : MonoBehaviour,IAttack
         enemyHealth = GetComponent<EnemyHealth>();
         anim = GetComponent<Animator>();
     }
-    
+
+    private void OnDisable()
+    {
+        playerInRange = false;
+    }
+
 
     void Update()
     {
