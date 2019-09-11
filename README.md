@@ -11,3 +11,6 @@ Unity3D开发的第三人称打僵尸生存游戏
 * 设计新的怪物
 * 增加枪械兵种
 * 增加补给箱种类
+# 游戏截图
+![](https://github.com/YYYurz/BoxBox/blob/master/ScreenShot/1.jpg)
+![](https://github.com/YYYurz/BoxBox/blob/master/ScreenShot/2.jpg)
